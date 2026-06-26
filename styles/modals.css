@@ -1,0 +1,290 @@
+/* ============================================================
+   CutFlow Studio — modals.css
+   Modal dialogs, context menus, export overlay, shortcut
+   cheat sheet, dropdowns shared across modules.
+   ============================================================ */
+
+/* ---------------- MODAL ROOT / BACKDROP ---------------- */
+.cf-modal-root:empty { display: none; }
+
+.cf-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: cf-fade-in var(--dur-med) var(--ease-standard);
+}
+
+.cf-modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  min-width: 360px;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  animation: cf-modal-in var(--dur-med) var(--ease-standard);
+}
+
+.cf-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.cf-modal-title { font-size: var(--fs-lg); font-weight: 600; color: var(--text-primary); }
+.cf-modal-close {
+  width: 26px; height: 26px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.cf-modal-close:hover { background: var(--bg-4); color: var(--text-primary); }
+
+.cf-modal-body {
+  padding: var(--sp-4);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.cf-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
+@keyframes cf-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cf-modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------------- FORM ELEMENTS INSIDE MODALS ---------------- */
+.cf-form-row { margin-bottom: var(--sp-3); }
+.cf-form-label {
+  display: block;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-1);
+}
+.cf-form-input,
+.cf-form-select {
+  width: 100%;
+  background: var(--bg-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: var(--sp-2);
+  font-size: var(--fs-sm);
+  outline: none;
+}
+.cf-form-input:focus, .cf-form-select:focus { border-color: var(--accent); }
+
+.cf-form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.cf-form-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-2); }
+
+.cf-radio-card-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.cf-radio-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.cf-radio-card:hover { border-color: var(--border-strong); }
+.cf-radio-card.selected { border-color: var(--accent); background: var(--accent-soft); }
+.cf-radio-card input { accent-color: var(--accent); }
+
+/* ---------------- CONTEXT MENU ---------------- */
+.cf-context-menu-root:empty { display: none; }
+
+.cf-context-menu {
+  position: fixed;
+  z-index: var(--z-context-menu);
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  min-width: 190px;
+  padding: 4px;
+  animation: cf-context-in 0.1s var(--ease-standard);
+}
+@keyframes cf-context-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.cf-context-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 7px var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.cf-context-item:hover { background: var(--accent); color: #fff; }
+.cf-context-item.disabled { color: var(--text-disabled); pointer-events: none; }
+.cf-context-item-shortcut { font-size: 10px; color: var(--text-tertiary); font-family: var(--font-mono); }
+.cf-context-item:hover .cf-context-item-shortcut { color: rgba(255,255,255,0.8); }
+.cf-context-separator { height: 1px; background: var(--border-subtle); margin: 4px 2px; }
+
+/* ---------------- EXPORT OVERLAY ---------------- */
+.cf-export-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cf-export-overlay[hidden] { display: none; }
+
+.cf-export-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+  width: 380px;
+  text-align: center;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+.cf-export-card h3 { margin: 0 0 var(--sp-4); font-size: var(--fs-lg); color: var(--text-primary); }
+
+.cf-progress-track {
+  height: 8px;
+  background: var(--bg-1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--sp-3);
+}
+.cf-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.15s var(--ease-standard);
+}
+
+.cf-export-label {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--sp-4);
+  font-family: var(--font-mono);
+}
+
+/* ---------------- SHORTCUT CHEAT SHEET ---------------- */
+.cf-cheatsheet {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cf-cheatsheet[hidden] { display: none; }
+
+.cf-cheatsheet-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+  width: 640px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+.cf-cheatsheet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-5);
+  margin-top: var(--sp-4);
+}
+.cf-cheatsheet-group-title {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-2);
+}
+.cf-cheatsheet-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.cf-cheatsheet-key {
+  font-family: var(--font-mono);
+  background: var(--bg-4);
+  color: var(--text-primary);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: var(--fs-xs);
+}
+
+/* ---------------- DROPDOWN MENU (file/edit/view/export menus) ---------------- */
+.cf-dropdown-menu {
+  position: fixed;
+  z-index: var(--z-dropdown);
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  min-width: 200px;
+  padding: 4px;
+}
+.cf-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 7px var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.cf-dropdown-item:hover { background: var(--accent); color: #fff; }
+.cf-dropdown-separator { height: 1px; background: var(--border-subtle); margin: 4px 2px; }
+
+/* ---------------- ONBOARDING TOUR ---------------- */
+.cf-tour-spotlight {
+  position: fixed;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);
+  z-index: var(--z-modal);
+  pointer-events: none;
+  transition: all 0.25s var(--ease-standard);
+}
+.cf-tour-tooltip {
+  position: fixed;
+  z-index: calc(var(--z-modal) + 1);
+  background: var(--bg-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+  width: 280px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+}
+.cf-tour-tooltip-title { font-size: var(--fs-md); font-weight: 600; color: var(--text-primary); margin-bottom: var(--sp-1); }
+.cf-tour-tooltip-body { font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: var(--sp-3); }
+.cf-tour-tooltip-footer { display: flex; align-items: center; justify-content: space-between; }
+.cf-tour-tooltip-step { font-size: var(--fs-xs); color: var(--text-tertiary); }

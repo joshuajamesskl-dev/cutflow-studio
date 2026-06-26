@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1280, initial-scale=1.0" />
+<title>CutFlow Studio</title>
+
+<!-- Tailwind (CDN, utility classes only — all custom visual language lives in our own CSS) -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Google Fonts loader target — user-selectable fonts are injected dynamically by text.js -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- App styles -->
+<link rel="stylesheet" href="styles/main.css" />
+<link rel="stylesheet" href="styles/timeline.css" />
+<link rel="stylesheet" href="styles/panels.css" />
+<link rel="stylesheet" href="styles/modals.css" />
+</head>
+<body class="cf-body">
+
+<!-- ============================================================ -->
+<!-- APP ROOT                                                       -->
+<!-- ============================================================ -->
+<div id="app" class="cf-app">
+
+  <!-- ============================== TOP TOOLBAR ============================== -->
+  <header id="toolbar" class="cf-toolbar">
+    <div class="cf-toolbar-group cf-toolbar-left">
+      <button id="btn-logo" class="cf-logo" title="CutFlow Studio">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="var(--accent)" stroke-width="2"/><path d="M9 8l7 4-7 4V8z" fill="var(--accent)"/></svg>
+        <span>CutFlow</span>
+      </button>
+      <div class="cf-divider"></div>
+
+      <div class="cf-menu-bar">
+        <button class="cf-menu-btn" data-menu="file">File</button>
+        <button class="cf-menu-btn" data-menu="edit">Edit</button>
+        <button class="cf-menu-btn" data-menu="view">View</button>
+        <button class="cf-menu-btn" data-menu="export">Export</button>
+        <button class="cf-menu-btn" data-menu="help">Help</button>
+      </div>
+    </div>
+
+    <div class="cf-toolbar-group cf-toolbar-center">
+      <span id="project-name" class="cf-project-name" contenteditable="true" spellcheck="false">Untitled Project</span>
+      <span id="autosave-indicator" class="cf-autosave-indicator" title="Autosave status">●</span>
+    </div>
+
+    <div class="cf-toolbar-group cf-toolbar-right">
+      <button id="btn-undo" class="cf-icon-btn" title="Undo (Ctrl+Z)" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 8"/></svg>
+      </button>
+      <button id="btn-redo" class="cf-icon-btn" title="Redo (Ctrl+Shift+Z)" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M21 13a9 9 0 1 1-3-7.7L21 8"/></svg>
+      </button>
+      <div class="cf-divider"></div>
+      <button id="btn-shortcuts" class="cf-icon-btn" title="Keyboard Shortcuts (?)">?</button>
+      <button id="btn-export" class="cf-btn cf-btn-primary" title="Export (Ctrl+E)">Export</button>
+    </div>
+  </header>
+
+  <!-- ============================== MAIN BODY ============================== -->
+  <main class="cf-main">
+
+    <!-- ---------------- LEFT: MEDIA BIN + EFFECTS BROWSER ---------------- -->
+    <aside id="panel-left" class="cf-panel cf-panel-left" data-panel="left">
+      <div class="cf-panel-tabs">
+        <button class="cf-panel-tab active" data-tab="media">Media</button>
+        <button class="cf-panel-tab" data-tab="effects">Effects</button>
+        <button class="cf-panel-tab" data-tab="transitions">Transitions</button>
+        <button class="cf-panel-tab" data-tab="text">Titles</button>
+      </div>
+
+      <div class="cf-panel-body">
+
+        <!-- Media Bin -->
+        <section id="tab-media" class="cf-tab-content active">
+          <div class="cf-panel-toolbar">
+            <button id="btn-import-media" class="cf-btn cf-btn-sm">+ Import</button>
+            <input id="input-import-media" type="file" accept="video/*,audio/*,image/*" multiple hidden />
+            <button id="btn-media-grid-toggle" class="cf-icon-btn cf-icon-btn-sm" title="Toggle view">▦</button>
+          </div>
+          <div id="media-bin-dropzone" class="cf-dropzone">
+            <div id="media-bin-list" class="cf-media-list">
+              <p class="cf-empty-hint">Drag files here or click Import to add video, audio, and images.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Effects Browser -->
+        <section id="tab-effects" class="cf-tab-content">
+          <input type="search" id="effects-search" class="cf-search" placeholder="Search effects..." />
+          <div id="effects-list" class="cf-effects-list"></div>
+        </section>
+
+        <!-- Transitions Browser -->
+        <section id="tab-transitions" class="cf-tab-content">
+          <input type="search" id="transitions-search" class="cf-search" placeholder="Search transitions..." />
+          <div id="transitions-list" class="cf-transitions-list"></div>
+        </section>
+
+        <!-- Titles / Text Templates -->
+        <section id="tab-text" class="cf-tab-content">
+          <div id="text-templates-list" class="cf-text-templates-list"></div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- ---------------- CENTER: PREVIEW + TIMELINE ---------------- -->
+    <section class="cf-center">
+
+      <!-- Preview Player -->
+      <div id="preview-container" class="cf-preview-container">
+        <div class="cf-preview-stage">
+          <canvas id="preview-canvas" width="1920" height="1080"></canvas>
+          <div id="preview-overlay-ui" class="cf-preview-overlay-ui"></div>
+        </div>
+
+        <div class="cf-preview-controls">
+          <div class="cf-preview-controls-row">
+            <button id="btn-play-pause" class="cf-icon-btn cf-icon-btn-lg" title="Play/Pause (Space)">
+              <svg id="icon-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="icon-pause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+            </button>
+            <button id="btn-step-back" class="cf-icon-btn" title="Previous frame (←)">⏮</button>
+            <button id="btn-step-fwd" class="cf-icon-btn" title="Next frame (→)">⏭</button>
+            <span id="timecode-current" class="cf-timecode">00:00:00:00</span>
+            <span class="cf-timecode-sep">/</span>
+            <span id="timecode-total" class="cf-timecode cf-timecode-total">00:00:00:00</span>
+
+            <div class="cf-flex-spacer"></div>
+
+            <select id="select-quality" class="cf-select cf-select-sm" title="Preview quality">
+              <option value="0.25">Quarter</option>
+              <option value="0.5" selected>Half</option>
+              <option value="1">Full</option>
+            </select>
+
+            <button id="btn-fullscreen-preview" class="cf-icon-btn" title="Fullscreen preview">⛶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div id="timeline-container" class="cf-timeline-container">
+        <div class="cf-timeline-toolbar">
+          <div class="cf-toolbar-group">
+            <button id="btn-tool-select" class="cf-tool-btn active" data-tool="select" title="Select (V)">↖</button>
+            <button id="btn-tool-cut" class="cf-tool-btn" data-tool="cut" title="Cut/Razor (C)">✂</button>
+            <div class="cf-divider"></div>
+            <button id="btn-split" class="cf-icon-btn" title="Split at playhead (S)">⎘</button>
+            <button id="btn-ripple-delete" class="cf-icon-btn" title="Ripple delete (Shift+Del)">⌫</button>
+            <div class="cf-divider"></div>
+            <button id="btn-mark-in" class="cf-icon-btn" title="Mark In (I)">[</button>
+            <button id="btn-mark-out" class="cf-icon-btn" title="Mark Out (O)">]</button>
+            <div class="cf-divider"></div>
+            <button id="btn-snap-toggle" class="cf-icon-btn active" title="Toggle snapping (N)">⌖</button>
+            <button id="btn-magnetic-toggle" class="cf-icon-btn active" title="Magnetic timeline (M)">🧲</button>
+          </div>
+
+          <div class="cf-toolbar-group">
+            <button id="btn-add-video-track" class="cf-btn cf-btn-sm">+ Video Track</button>
+            <button id="btn-add-audio-track" class="cf-btn cf-btn-sm">+ Audio Track</button>
+          </div>
+
+          <div class="cf-toolbar-group cf-toolbar-right">
+            <button id="btn-zoom-out" class="cf-icon-btn" title="Zoom out">−</button>
+            <input id="zoom-slider" type="range" min="1" max="100" value="30" class="cf-zoom-slider" />
+            <button id="btn-zoom-in" class="cf-icon-btn" title="Zoom in">+</button>
+            <button id="btn-zoom-fit" class="cf-icon-btn" title="Zoom to fit">⊡</button>
+          </div>
+        </div>
+
+        <div id="timeline-scroll" class="cf-timeline-scroll">
+          <div id="timeline-ruler" class="cf-timeline-ruler"></div>
+          <div id="timeline-tracks-header" class="cf-timeline-tracks-header"></div>
+          <div id="timeline-tracks" class="cf-timeline-tracks">
+            <div id="timeline-playhead" class="cf-timeline-playhead"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------------- RIGHT: PROPERTIES PANEL ---------------- -->
+    <aside id="panel-right" class="cf-panel cf-panel-right" data-panel="right">
+      <div class="cf-panel-tabs">
+        <button class="cf-panel-tab active" data-tab="properties">Properties</button>
+        <button class="cf-panel-tab" data-tab="color">Color</button>
+        <button class="cf-panel-tab" data-tab="audio">Audio</button>
+        <button class="cf-panel-tab" data-tab="keyframes">Keyframes</button>
+      </div>
+
+      <div class="cf-panel-body">
+        <section id="rtab-properties" class="cf-tab-content active">
+          <div id="properties-content" class="cf-properties-content">
+            <p class="cf-empty-hint">Select a clip on the timeline to edit its properties.</p>
+          </div>
+        </section>
+
+        <section id="rtab-color" class="cf-tab-content">
+          <div id="color-content" class="cf-color-content"></div>
+        </section>
+
+        <section id="rtab-audio" class="cf-tab-content">
+          <div id="audio-mixer-content" class="cf-audio-mixer-content"></div>
+        </section>
+
+        <section id="rtab-keyframes" class="cf-tab-content">
+          <div id="keyframe-editor-content" class="cf-keyframe-editor-content"></div>
+        </section>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- ============================== STATUS BAR ============================== -->
+  <footer id="statusbar" class="cf-statusbar">
+    <span id="status-message" class="cf-status-message">Ready</span>
+    <div class="cf-flex-spacer"></div>
+    <span id="status-project-stats" class="cf-status-stats"></span>
+    <span id="status-ffmpeg-state" class="cf-status-ffmpeg" title="FFmpeg.wasm engine status">FFmpeg: loading…</span>
+  </footer>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- MODALS / OVERLAYS (populated/controlled by ui.js)             -->
+<!-- ============================================================ -->
+<div id="modal-root" class="cf-modal-root"></div>
+<div id="context-menu-root" class="cf-context-menu-root"></div>
+<div id="toast-root" class="cf-toast-root"></div>
+
+<div id="export-progress-overlay" class="cf-export-overlay" hidden>
+  <div class="cf-export-card">
+    <h3>Exporting…</h3>
+    <div class="cf-progress-track"><div id="export-progress-bar" class="cf-progress-bar"></div></div>
+    <p id="export-progress-label" class="cf-export-label">Preparing…</p>
+    <button id="btn-export-cancel" class="cf-btn cf-btn-danger cf-btn-sm">Cancel</button>
+  </div>
+</div>
+
+<div id="shortcut-cheatsheet" class="cf-cheatsheet" hidden></div>
+
+<!-- ============================================================ -->
+<!-- APP MODULES (ES Modules — app.js is the entry point)          -->
+<!-- ============================================================ -->
+<script type="module" src="js/app.js"></script>
+
+</body>
+</html>
